@@ -1,4 +1,4 @@
-# Drug Store Inventory Management System v1.3
+# Drug Store Inventory Management System v2.0
 
 A comprehensive desktop application for managing drug store inventory, built with Java Swing and MySQL database.
 
@@ -8,7 +8,8 @@ A comprehensive desktop application for managing drug store inventory, built wit
 - **Product Management**: Add, edit, delete, and view products with categories
 - **Category Management**: Organize products into categories
 - **Dashboard**: Overview of inventory statistics and analytics
-- **Data Exchange**: Import/export product data in CSV and JSON formats
+- **Report Generation**: Dashboard-driven reports with category/vendor filtering and improved back navigation
+- **Data Exchange**: Import/export product data in CSV and JSON formats, with preset CSV export filename and file extension selection
 - **Inventory Tracking**: Monitor stock levels, prices, and product details
 
 ## Prerequisites
@@ -73,7 +74,22 @@ Before setting up the system, ensure you have the following installed:
    - Select `Run` or press `F6`
    - The application will start with the Login screen
 
-3. **Alternative: Run JAR file**
+3. **Run from VS Code**
+   - Install the Java Extension Pack or Java support extensions
+   - Open the project folder in VS Code
+   - Ensure the workspace JDK is set to JDK 18 or higher
+   - Use the Run view or the `Run Java` action on `src/app/App.java`
+   - Alternatively, run from the integrated terminal:
+     - `cd "<project-root>"`
+     - `javac -d build\classes src\app\App.java` (or use your IDE build task)
+     - `java -cp build\classes app.App`
+   - Or use Ant from the VS Code terminal:
+     - `ant clean` to clean generated files
+     - `ant build` to compile the project
+     - `ant run` to start the application
+   - The app launches with the Login screen
+
+4. **Alternative: Run JAR file**
    - After building, find the JAR in `dist/` directory
    - Run with: `java -jar SDI_DrugStore_Application_1.3.jar`
 
@@ -82,16 +98,16 @@ Before setting up the system, ensure you have the following installed:
 ### Login
 - **Default Manager Account:**
   - Username: `manager`
-  - Password: `manager123`
+  - Password: `Manager123`
 - **Default Staff Account:**
   - Username: `staff`
-  - Password: `staff123`
+  - Password: `Staff123`
 
 ### Navigation
 - **Dashboard**: View inventory statistics and overview
 - **Products**: Manage product inventory
 - **Categories**: Manage product categories
-- **Data Exchange**: Import/export data in CSV/JSON formats
+- **Data Exchange**: Import/export data in CSV formats
 
 ### Product Management
 - Add new products with name, description, price, stock, category
@@ -105,8 +121,8 @@ Before setting up the system, ensure you have the following installed:
 - Delete categories (only if no products are assigned)
 
 ### Data Exchange
-- **Export**: Export product data to CSV or JSON files
-- **Import**: Import product data from CSV or JSON files
+- **Export**: Export product data to CSV files, with a predefined `product_inventory.csv` filename and selected CSV extension
+- **Import**: Import product data from CSV files
 - Supports bulk operations for inventory management
 
 ## Project Structure
@@ -190,6 +206,6 @@ For technical support or questions about the system:
 
 ---
 
-**Version:** 1.3
-**Last Updated:** January 16, 2026
+**Version:** 2.0
+**Last Updated:** July 3, 2026
 **Developed with:** Apache NetBeans IDE 27, Java 18, MySQL</content>
