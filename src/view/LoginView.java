@@ -5,15 +5,18 @@
 package view;
 
 import controller.AuthController;
-import model.User;
 import controller.CategoryController;
 import controller.ProductController;
+import controller.DataExchangeController;
+import controller.DashboardController;
+import model.User;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import view.DashboardView;
 import controller.DataExchangeController;
 import controller.DashboardController;
 import controller.ReportController;
+import controller.VendorController;
 /**
  *
  * @author Itadori
@@ -26,6 +29,7 @@ public class LoginView extends javax.swing.JFrame {
     private DataExchangeController dataexchangeController;
     private DashboardController dashboardController;
     private ReportController reportController;
+    private VendorController vendorController;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LoginView.class.getName());
 
     /**
@@ -35,14 +39,23 @@ public class LoginView extends javax.swing.JFrame {
         initComponents();
     }
 
-    public LoginView(AuthController authController, CategoryController categoryController, ProductController productController, DataExchangeController dataexchangeController, DashboardController dashboardController, ReportController reportController) {
+    public LoginView(AuthController authController, CategoryController categoryController, ProductController productController, DataExchangeController dataexchangeController, DashboardController dashboardController, ReportController reportController, VendorController vendorController) {
         initComponents();
+        
+        // FlatLaf Design
+        txtUsername.putClientProperty("JTextField.placeholderText", "Enter username");
+        txtPassword.putClientProperty("JTextField.placeholderText", "Enter password");
+        txtPassword.putClientProperty("JPasswordField.showRevealButton", true);
+        btnLogin.putClientProperty("JButton.buttonType", "roundRect");
+        btnLogin.putClientProperty("FlatLaf.style", "background: #2196F3; foreground: #FFFFFF; font: bold;");
+        
         this.authController = authController;
         this.categoryController = categoryController;
         this.productController = productController;
         this.dataexchangeController = dataexchangeController;
         this.dashboardController = dashboardController;
         this.reportController = reportController;
+        this.vendorController = vendorController;
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -69,9 +82,10 @@ public class LoginView extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Drugstore Inventory Management");
 
-        jPanel1.setBackground(new java.awt.Color(153, 153, 153));
+        jPanel1.setBackground(new java.awt.Color(18, 143, 242));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Drugstore Inventory Management");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -81,14 +95,14 @@ public class LoginView extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addGap(146, 146, 146))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(17, 17, 17)
+                .addContainerGap(21, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         jLabel2.setText("Username :");
@@ -120,13 +134,13 @@ public class LoginView extends javax.swing.JFrame {
                         .addGap(6, 6, 6)
                         .addComponent(jLabel5))
                     .addComponent(jLabel4))
-                .addGap(180, 180, 180))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
-                .addGap(123, 123, 123)
+                .addContainerGap(129, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(jLabel2))
-                .addGap(31, 31, 31)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnLogin)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -138,11 +152,11 @@ public class LoginView extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(18, 18, Short.MAX_VALUE)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5)
-                .addGap(41, 41, 41)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
@@ -152,7 +166,7 @@ public class LoginView extends javax.swing.JFrame {
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(27, 27, 27)
                 .addComponent(btnLogin)
-                .addGap(0, 41, Short.MAX_VALUE))
+                .addGap(0, 196, Short.MAX_VALUE))
         );
 
         pack();
@@ -165,7 +179,7 @@ public class LoginView extends javax.swing.JFrame {
 
             User u = authController.login(username, password);
 
-            DashboardView dash = new DashboardView(authController, categoryController, productController, dataexchangeController, dashboardController, reportController, u);
+            DashboardView dash = new DashboardView(authController, categoryController, productController, dataexchangeController, dashboardController, reportController, vendorController, u);
             dash.setVisible(true);
             this.dispose();
 

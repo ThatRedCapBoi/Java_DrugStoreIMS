@@ -8,7 +8,8 @@ package controller;
  *
  * @author Itadori
  */
-import dto.DashboardStats;
+import dto.ReportFilter;
+import dto.ReportResult;
 import service.DashboardService;
 
 public class DashboardController {
@@ -19,7 +20,7 @@ public class DashboardController {
         this.service = service;
     }
 
-    public DashboardStats generate(int threshold, String role) {
-        return service.generate(threshold, role);
+    public ReportResult generateReport(ReportFilter filter) {
+        return service.generateReport(filter);
     }
 }

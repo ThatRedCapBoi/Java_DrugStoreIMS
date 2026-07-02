@@ -6,3 +6,8 @@ bin/
 obj/
 nbproject/private/private.properties
 nbproject/private/private.xml
+build/
+dist/
+*.class
+*.jar
+bproject/private/

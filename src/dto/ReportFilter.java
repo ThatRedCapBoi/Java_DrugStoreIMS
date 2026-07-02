@@ -3,47 +3,44 @@ package dto;
 import java.time.LocalDate;
 
 /**
- * Encapsulates the filter parameters for the inventory report.
- * All fields are optional; a null/zero value means "no filter on this field".
+ * Filter criteria for the Manager Generate Report (M02). Null/blank fields mean
+ * "no bound / all".
+ *
+ * @author Itadori
  */
 public class ReportFilter {
 
-    private LocalDate dateFrom;   // filter products with created_at >= dateFrom
-    private LocalDate dateTo;     // filter products with created_at <= dateTo
-    private String keyword;       // partial match on SKU or name
-    private long categoryId;      // 0 = all categories
+    private final LocalDate from;      // null = no lower bound (on created_at)
+    private final LocalDate to;        // null = no upper bound
+    private final Long categoryId;     // null = all categories
+    private final String productQuery; // null/blank = all products (matches name or SKU)
+    private final int threshold;       // low-stock threshold
 
-    public ReportFilter() {}
-
-    public LocalDate getDateFrom() {
-        return dateFrom;
+    public ReportFilter(LocalDate from, LocalDate to, Long categoryId, String productQuery, int threshold) {
+        this.from = from;
+        this.to = to;
+        this.categoryId = categoryId;
+        this.productQuery = productQuery;
+        this.threshold = threshold;
     }
 
-    public void setDateFrom(LocalDate dateFrom) {
-        this.dateFrom = dateFrom;
+    public LocalDate getFrom() {
+        return from;
     }
 
-    public LocalDate getDateTo() {
-        return dateTo;
+    public LocalDate getTo() {
+        return to;
     }
 
-    public void setDateTo(LocalDate dateTo) {
-        this.dateTo = dateTo;
-    }
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
-    }
-
-    public long getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(long categoryId) {
-        this.categoryId = categoryId;
+    public String getProductQuery() {
+        return productQuery;
+    }
+
+    public int getThreshold() {
+        return threshold;
     }
 }

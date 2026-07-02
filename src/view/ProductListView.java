@@ -30,7 +30,7 @@ public class ProductListView extends javax.swing.JFrame {
     /**
      * Creates new form ProductListView
      */
-    public ProductListView(ProductController productController, CategoryController categoryController, String role, Runnable onBack) {
+public ProductListView(ProductController productController, CategoryController categoryController, String role, Runnable onBack) {
         initComponents();
         this.productController = productController;
         this.categoryController = categoryController;
@@ -38,8 +38,21 @@ public class ProductListView extends javax.swing.JFrame {
         this.onBack = onBack;
 
         setLocationRelativeTo(null);
+
+        // FlatLaf button styling
+        String primaryStyle = "background: #2196F3; foreground: #FFFFFF; font: bold;";
+        String dangerStyle = "background: #E53935; foreground: #FFFFFF; font: bold;";
+        javax.swing.JButton[] actionBtns = {btnAdd, btnEdit, btnRefresh, btnSearch, btnClear};
+        for (javax.swing.JButton b : actionBtns) {
+            b.putClientProperty("JButton.buttonType", "roundRect");
+            b.putClientProperty("FlatLaf.style", primaryStyle);
+        }
+        btnDelete.putClientProperty("JButton.buttonType", "roundRect");
+        btnDelete.putClientProperty("FlatLaf.style", dangerStyle);
+        btnBack.putClientProperty("JButton.buttonType", "roundRect");
+
         tableModel = new DefaultTableModel(
-                new Object[]{"ID", "SKU", "Name", "Price", "Qty", "Category"}, 0) {
+                new Object[]{"ID", "SKU", "Name", "Price", "Qty", "Category", "Vendor", "Created", "Updated"}, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
@@ -85,15 +98,22 @@ public class ProductListView extends javax.swing.JFrame {
         for (Category c : cats) {
             catName.put(c.getId(), c.getName());
         }
+        java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy");
         for (Product p : products) {
             String cName = catName.getOrDefault(p.getCategoryId(), "N/A");
+            String vendor = p.getVendor() != null ? p.getVendor() : "N/A";
+            String created = p.getCreatedAt() != null ? p.getCreatedAt().format(fmt) : "";
+            String updated = p.getUpdatedAt() != null ? p.getUpdatedAt().format(fmt) : "";
             tableModel.addRow(new Object[]{
                 p.getId(),
                 p.getSku(),
                 p.getName(),
                 p.getPrice(),
                 p.getQuantity(),
-                cName
+                cName,
+                vendor,
+                created,
+                updated
             });
         }
     }
@@ -131,10 +151,11 @@ public class ProductListView extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Product List View");
 
-        jPanel1.setBackground(new java.awt.Color(0, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(18, 143, 242));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel1.setText("Product List View");
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("Product List");
 
         btnBack.setText("back");
         btnBack.addActionListener(new java.awt.event.ActionListener() {
@@ -150,18 +171,18 @@ public class ProductListView extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addGap(70, 70, 70)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnBack)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(15, 15, 15)
+                .addContainerGap(21, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(btnBack))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         jLabel2.setText("Search :");
@@ -177,16 +198,20 @@ public class ProductListView extends javax.swing.JFrame {
 
         tblProducts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "id", "sku", "name", "price", "quantity", "category_id"
+                "id", "sku", "name", "price", "quantity", "category_id", "vendor", "created_at", "updated_at"
             }
         ));
         jScrollPane1.setViewportView(tblProducts);
+        if (tblProducts.getColumnModel().getColumnCount() > 0) {
+            tblProducts.getColumnModel().getColumn(0).setResizable(false);
+            tblProducts.getColumnModel().getColumn(0).setPreferredWidth(15);
+        }
 
         btnAdd.setText("Add");
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -248,7 +273,7 @@ public class ProductListView extends javax.swing.JFrame {
                         .addComponent(btnEdit)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnClear)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
                         .addComponent(btnDelete)
                         .addGap(18, 18, 18)
                         .addComponent(btnRefresh)))
@@ -258,13 +283,13 @@ public class ProductListView extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSearch))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAdd)

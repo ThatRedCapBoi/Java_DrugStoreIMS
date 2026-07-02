@@ -8,9 +8,10 @@ package service;
  *
  * @author Itadori
  */
-import dto.DashboardStats;
+import dto.ReportFilter;
+import dto.ReportResult;
 
 public interface DashboardService {
 
-    DashboardStats generate(int lowStockThreshold, String role);
+    ReportResult generateReport(ReportFilter filter);
 }

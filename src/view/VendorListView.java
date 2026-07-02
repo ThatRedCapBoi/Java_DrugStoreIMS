@@ -4,11 +4,11 @@
  */
 package view;
 
-import controller.CategoryController;
+import controller.VendorController;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import model.Category;
+import model.Vendor;
 import state.AppState;
 import state.StateFactory;
 
@@ -16,20 +16,18 @@ import state.StateFactory;
  *
  * @author Itadori
  */
-public class CategoryListView extends javax.swing.JFrame {
+public class VendorListView extends javax.swing.JFrame {
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CategoryListView.class.getName());
-    private  CategoryController controller;
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VendorListView.class.getName());
+    private  VendorController controller;
     private  String role; // role from logged-in user
     private DefaultTableModel tableModel;
     private final Runnable onBack;
     
-    
-    
     /**
-     * Creates new form CategoryListView
+     * Creates new form VendorListView
      */
-    public CategoryListView(controller.CategoryController controller, String role, Runnable onBack) {
+    public VendorListView(controller.VendorController controller, String role, Runnable onBack) {
         initComponents();
         this.controller = controller;
         this.role = role;
@@ -37,16 +35,16 @@ public class CategoryListView extends javax.swing.JFrame {
         
         setLocationRelativeTo(null);
 
-        tableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Description"}, 0) {
+        tableModel = new DefaultTableModel(new Object[]{"Internal ID", "Vendor ID", "Vendor Name", "Person Incharge", "Address"}, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
             }
         };
-        tblCategories.setModel(tableModel);
+        tblVendors.setModel(tableModel);
 
         applyPermissions();
-        loadCategories();
+        loadVendors();
     }
 
     private void applyPermissions() {
@@ -66,21 +64,21 @@ public class CategoryListView extends javax.swing.JFrame {
         btnDelete.setEnabled(enabled);
     }
 
-    private void loadCategories() {
+    private void loadVendors() {
         try {
             tableModel.setRowCount(0);
-            List<Category> cats = controller.listCategories();
-            for (Category c : cats) {
-                tableModel.addRow(new Object[]{c.getId(), c.getName(), c.getDescription()});
+            List<Vendor> vnds = controller.listVendors();
+            for (Vendor v : vnds) {
+                tableModel.addRow(new Object[]{v.getId(), v.getVendorId(), v.getName(), v.getPersonIncharge(), v.getAddress()});
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Failed to load categories:\n" + e.getMessage(),
+            JOptionPane.showMessageDialog(this, "Failed to load vendors:\n" + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private long selectedId() {
-        int row = tblCategories.getSelectedRow();
+        int row = tblVendors.getSelectedRow();
         if (row < 0) {
             return -1;
         }
@@ -101,7 +99,7 @@ public class CategoryListView extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         btnBack = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblCategories = new javax.swing.JTable();
+        tblVendors = new javax.swing.JTable();
         btnAdd = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
@@ -109,12 +107,11 @@ public class CategoryListView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(18, 143, 242));
+        jPanel1.setBackground(new java.awt.Color(0, 255, 255));
         jPanel1.setForeground(new java.awt.Color(0, 255, 255));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Category List");
+        jLabel1.setText("Vendor List View");
 
         btnBack.setText("back");
         btnBack.addActionListener(new java.awt.event.ActionListener() {
@@ -128,34 +125,34 @@ public class CategoryListView extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(121, 121, 121)
                 .addComponent(jLabel1)
-                .addGap(117, 117, 117)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnBack)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(21, Short.MAX_VALUE)
+                .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(btnBack))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
-        tblCategories.setModel(new javax.swing.table.DefaultTableModel(
+        tblVendors.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Category Name", "Description"
+                "Internal ID", "Vendor ID", "Vendor Name", "Person Incharge", "Address"
             }
         ));
-        jScrollPane1.setViewportView(tblCategories);
+        jScrollPane1.setViewportView(tblVendors);
 
         btnAdd.setText("Add");
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -193,7 +190,7 @@ public class CategoryListView extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnAdd)
                         .addGap(18, 18, 18)
@@ -209,7 +206,7 @@ public class CategoryListView extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAdd)
@@ -223,38 +220,38 @@ public class CategoryListView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        CategoryFormView form = new CategoryFormView(this, controller, role, null, this::loadCategories);
+        VendorFormView form = new VendorFormView(this, controller, role, null, this::loadVendors);
         form.setVisible(true);
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         long id = selectedId();
         if (id <= 0) {
-            JOptionPane.showMessageDialog(this, "Select a category first.");
+            JOptionPane.showMessageDialog(this, "Select a Vendor first.");
             return;
         }
-        controller.getCategory(id).ifPresentOrElse(cat -> {
-            CategoryFormView form = new CategoryFormView(this, controller, role, cat, this::loadCategories);
+        controller.getVendor(id).ifPresentOrElse(vnd -> {
+            VendorFormView form = new VendorFormView(this, controller, role, vnd, this::loadVendors);
             form.setVisible(true);
-        }, () -> JOptionPane.showMessageDialog(this, "Category not found."));
+        }, () -> JOptionPane.showMessageDialog(this, "Vendor not found."));
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         long id = selectedId();
         if (id <= 0) {
-            JOptionPane.showMessageDialog(this, "Select a category first.");
+            JOptionPane.showMessageDialog(this, "Select a Vendor first.");
             return;
         }
 
-        int r = JOptionPane.showConfirmDialog(this, "Delete this category?", "Confirm",
+        int r = JOptionPane.showConfirmDialog(this, "Delete this Vendor?", "Confirm",
                 JOptionPane.YES_NO_OPTION);
         if (r != JOptionPane.YES_OPTION) {
             return;
         }
 
         try {
-            controller.deleteCategory(id, role);
-            loadCategories();
+            controller.delete(id, role);
+            loadVendors();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Delete failed:\n" + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
@@ -262,7 +259,7 @@ public class CategoryListView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        loadCategories();
+        loadVendors();
     }//GEN-LAST:event_btnRefreshActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
@@ -292,7 +289,7 @@ public class CategoryListView extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form 
-        java.awt.EventQueue.invokeLater(() -> new CategoryListView().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new VendorListView().setVisible(true));
     }*/
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -304,6 +301,6 @@ public class CategoryListView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tblCategories;
+    private javax.swing.JTable tblVendors;
     // End of variables declaration//GEN-END:variables
 }

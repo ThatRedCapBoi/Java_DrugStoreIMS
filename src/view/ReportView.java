@@ -1,267 +1,167 @@
 package view;
 
 import controller.CategoryController;
-import controller.ReportController;
+import controller.DashboardController;
 import dto.ReportFilter;
-import dto.ReportRow;
-import model.Category;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import dto.ReportResult;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import model.Category;
+import model.Product;
 
 /**
- * Inventory Report view accessible to both Staff and Manager.
- * Allows filtering by date range (product added date), product SKU/name, and category.
+ * Manager Generate Report window (M02): filter by date/product/category, view a
+ * stock-per-category bar chart, product table, and headline counts.
+ *
+ * @author Itadori
  */
 public class ReportView extends JFrame {
 
-    private final ReportController reportController;
-    private final CategoryController categoryController;
-    private final Runnable onBack;
+    private static final int THRESHOLD = 10;
 
-    private JTextField txtDateFrom;
-    private JTextField txtDateTo;
-    private JTextField txtKeyword;
-    private JComboBox<CategoryItem> cmbCategory;
-    private JButton btnGenerate;
-    private JButton btnClear;
-    private JButton btnBack;
-    private JTable tblReport;
-    private DefaultTableModel tableModel;
-    private JLabel lblSummary;
+    private final DashboardController dashboardController;
 
-    public ReportView(ReportController reportController,
-            CategoryController categoryController,
-            Runnable onBack) {
-        this.reportController = reportController;
-        this.categoryController = categoryController;
-        this.onBack = onBack;
+    private final JComboBox<CategoryItem> cboCategory = new JComboBox<>();
+    private final JTextField txtProduct = new JTextField(12);
+    private final JTextField txtFrom = new JTextField(9);
+    private final JTextField txtTo = new JTextField(9);
+    private final BarChartPanel chart = new BarChartPanel();
+    private final DefaultTableModel tableModel = new DefaultTableModel(
+            new Object[]{"SKU", "Name", "Category", "Qty", "Price", "Created"}, 0) {
+        @Override
+        public boolean isCellEditable(int r, int c) {
+            return false;
+        }
+    };
+    private final JLabel lblSummary = new JLabel(" ");
+    private final Map<Long, String> categoryNames = new HashMap<>();
 
-        buildUI();
-        loadCategories();
+    public ReportView(DashboardController dashboardController, CategoryController categoryController, String role) {
+        this.dashboardController = dashboardController;
 
-        setTitle("Inventory Report");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setMinimumSize(new Dimension(900, 520));
-        pack();
+        setTitle("Generate Report (" + role + ")");
+        setSize(720, 560);
         setLocationRelativeTo(null);
-    }
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-    private void buildUI() {
-        // ── Filter panel ────────────────────────────────────────────────────
-        JPanel filterPanel = new JPanel(new GridBagLayout());
-        filterPanel.setBorder(BorderFactory.createTitledBorder("Filters"));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 8, 5, 8);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // Row 0 – date range
-        gbc.gridx = 0; gbc.gridy = 0;
-        filterPanel.add(new JLabel("Date Added From (YYYY-MM-DD):"), gbc);
-        gbc.gridx = 1;
-        txtDateFrom = new JTextField(12);
-        filterPanel.add(txtDateFrom, gbc);
-
-        gbc.gridx = 2;
-        filterPanel.add(new JLabel("Date Added To (YYYY-MM-DD):"), gbc);
-        gbc.gridx = 3;
-        txtDateTo = new JTextField(12);
-        filterPanel.add(txtDateTo, gbc);
-
-        // Row 1 – product keyword and category
-        gbc.gridx = 0; gbc.gridy = 1;
-        filterPanel.add(new JLabel("Product (SKU / Name):"), gbc);
-        gbc.gridx = 1;
-        txtKeyword = new JTextField(12);
-        filterPanel.add(txtKeyword, gbc);
-
-        gbc.gridx = 2;
-        filterPanel.add(new JLabel("Category:"), gbc);
-        gbc.gridx = 3;
-        cmbCategory = new JComboBox<>();
-        cmbCategory.setPreferredSize(new Dimension(160, 24));
-        filterPanel.add(cmbCategory, gbc);
-
-        // Row 2 – action buttons
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        btnGenerate = new JButton("Generate Report");
-        btnGenerate.addActionListener(e -> onGenerate());
-        filterPanel.add(btnGenerate, gbc);
-
-        gbc.gridx = 2; gbc.gridwidth = 2;
-        btnClear = new JButton("Clear Filters");
-        btnClear.addActionListener(e -> onClear());
-        filterPanel.add(btnClear, gbc);
-
-        // ── Result table ─────────────────────────────────────────────────────
-        String[] columns = {"ID", "SKU", "Name", "Price (RM)", "Qty", "Category", "Date Added", "Last Updated"};
-        tableModel = new DefaultTableModel(columns, 0) {
-            @Override
-            public boolean isCellEditable(int row, int col) {
-                return false;
-            }
-        };
-        tblReport = new JTable(tableModel);
-        tblReport.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tblReport.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblReport.getTableHeader().setReorderingAllowed(false);
-
-        // Column width hints
-        int[] widths = {40, 80, 160, 80, 50, 110, 145, 145};
-        for (int i = 0; i < widths.length; i++) {
-            tblReport.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
+        DefaultComboBoxModel<CategoryItem> model = new DefaultComboBoxModel<>();
+        model.addElement(new CategoryItem("All categories", null));
+        for (Category c : categoryController.listCategories()) {
+            categoryNames.put(c.getId(), c.getName());
+            model.addElement(new CategoryItem(c.getName(), c.getId()));
         }
+        cboCategory.setModel(model);
 
-        JScrollPane scrollPane = new JScrollPane(tblReport);
-        scrollPane.setPreferredSize(new Dimension(860, 340));
+        add(buildFilterBar(), BorderLayout.NORTH);
 
-        // ── Bottom bar ───────────────────────────────────────────────────────
-        JPanel bottomPanel = new JPanel(new BorderLayout(8, 0));
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
+        JTable table = new JTable(tableModel);
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                chart, new JScrollPane(table));
+        split.setResizeWeight(0.55);
+        add(split, BorderLayout.CENTER);
 
-        lblSummary = new JLabel("Use the filters above and click Generate Report.");
-        bottomPanel.add(lblSummary, BorderLayout.CENTER);
+        lblSummary.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        add(lblSummary, BorderLayout.SOUTH);
 
-        btnBack = new JButton("Back to Dashboard");
-        btnBack.addActionListener(e -> onBack());
-        bottomPanel.add(btnBack, BorderLayout.EAST);
-
-        // ── Frame layout ─────────────────────────────────────────────────────
-        JPanel content = new JPanel(new BorderLayout(8, 8));
-        content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        content.add(filterPanel, BorderLayout.NORTH);
-        content.add(scrollPane, BorderLayout.CENTER);
-        content.add(bottomPanel, BorderLayout.SOUTH);
-
-        setContentPane(content);
+        generate(); // initial unfiltered report
     }
 
-    private void loadCategories() {
-        cmbCategory.removeAllItems();
-        cmbCategory.addItem(new CategoryItem(0L, "-- All Categories --"));
+    private JPanel buildFilterBar() {
+        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        bar.add(new JLabel("Category:"));
+        bar.add(cboCategory);
+        bar.add(new JLabel("Product:"));
+        bar.add(txtProduct);
+        bar.add(new JLabel("From:"));
+        bar.add(txtFrom);
+        bar.add(new JLabel("To:"));
+        bar.add(txtTo);
+        JButton btnGenerate = new JButton("Generate");
+        btnGenerate.addActionListener(e -> generate());
+        bar.add(btnGenerate);
+        txtFrom.setToolTipText("yyyy-MM-dd (optional)");
+        txtTo.setToolTipText("yyyy-MM-dd (optional)");
+        return bar;
+    }
+
+    private void generate() {
+        LocalDate from;
+        LocalDate to;
         try {
-            List<Category> cats = categoryController.listCategories();
-            for (Category c : cats) {
-                cmbCategory.addItem(new CategoryItem(c.getId(), c.getName()));
-            }
-        } catch (Exception e) {
-            // silently fall back to "All" if category load fails
-        }
-    }
-
-    private void onGenerate() {
-        ReportFilter filter = new ReportFilter();
-
-        // Parse date from
-        String fromStr = txtDateFrom.getText().trim();
-        if (!fromStr.isEmpty()) {
-            try {
-                filter.setDateFrom(LocalDate.parse(fromStr));
-            } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(this,
-                        "Invalid 'Date Added From' format.\nPlease use YYYY-MM-DD (e.g. 2024-01-15).",
-                        "Validation Error", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-        }
-
-        // Parse date to
-        String toStr = txtDateTo.getText().trim();
-        if (!toStr.isEmpty()) {
-            try {
-                filter.setDateTo(LocalDate.parse(toStr));
-            } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(this,
-                        "Invalid 'Date Added To' format.\nPlease use YYYY-MM-DD (e.g. 2024-12-31).",
-                        "Validation Error", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-        }
-
-        // Validate range ordering
-        if (filter.getDateFrom() != null && filter.getDateTo() != null
-                && filter.getDateFrom().isAfter(filter.getDateTo())) {
+            from = parseDate(txtFrom.getText());
+            to = parseDate(txtTo.getText());
+        } catch (DateTimeParseException ex) {
             JOptionPane.showMessageDialog(this,
-                    "'Date Added From' cannot be after 'Date Added To'.",
-                    "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    "Dates must be in yyyy-MM-dd format (leave blank for no bound).",
+                    "Invalid date", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        filter.setKeyword(txtKeyword.getText().trim());
+        CategoryItem selected = (CategoryItem) cboCategory.getSelectedItem();
+        Long categoryId = (selected == null) ? null : selected.id;
+        String product = txtProduct.getText().trim();
 
-        CategoryItem selected = (CategoryItem) cmbCategory.getSelectedItem();
-        if (selected != null) {
-            filter.setCategoryId(selected.getId());
-        }
+        ReportFilter filter = new ReportFilter(from, to, categoryId,
+                product.isEmpty() ? null : product, THRESHOLD);
 
         try {
-            List<ReportRow> rows = reportController.generateReport(filter);
-            populateTable(rows);
-            lblSummary.setText("Report generated — " + rows.size() + " product(s) found.");
+            ReportResult result = dashboardController.generateReport(filter);
+            chart.setData(result.getStockByCategory());
+
+            tableModel.setRowCount(0);
+            for (Product p : result.getProducts()) {
+                tableModel.addRow(new Object[]{
+                    p.getSku(), p.getName(),
+                    categoryNames.getOrDefault(p.getCategoryId(), "Uncategorized"),
+                    p.getQuantity(), p.getPrice(), p.getCreatedAt()
+                });
+            }
+            lblSummary.setText("Total: " + result.getTotalProducts()
+                    + "   |   Low stock (≤ " + result.getThreshold() + "): " + result.getLowStockCount());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
-                    "Failed to generate report:\n" + ex.getMessage(),
+                    "Generate report failed:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void onClear() {
-        txtDateFrom.setText("");
-        txtDateTo.setText("");
-        txtKeyword.setText("");
-        if (cmbCategory.getItemCount() > 0) {
-            cmbCategory.setSelectedIndex(0);
-        }
-        tableModel.setRowCount(0);
-        lblSummary.setText("Filters cleared. Click Generate Report to load all products.");
+    private LocalDate parseDate(String text) {
+        String t = text.trim();
+        return t.isEmpty() ? null : LocalDate.parse(t);
     }
 
-    private void onBack() {
-        if (onBack != null) {
-            onBack.run();
-        }
-        this.dispose();
-    }
-
-    private void populateTable(List<ReportRow> rows) {
-        tableModel.setRowCount(0);
-        for (ReportRow r : rows) {
-            tableModel.addRow(new Object[]{
-                r.getId(),
-                r.getSku(),
-                r.getName(),
-                r.getPrice(),
-                r.getQuantity(),
-                r.getCategoryName(),
-                r.getCreatedAt(),
-                r.getUpdatedAt()
-            });
-        }
-    }
-
-    // ── Inner helper ──────────────────────────────────────────────────────────
+    /** Combo entry: display label + backing category id (null = all). */
     private static class CategoryItem {
 
-        private final long id;
-        private final String displayName;
+        final String label;
+        final Long id;
 
-        CategoryItem(long id, String displayName) {
+        CategoryItem(String label, Long id) {
+            this.label = label;
             this.id = id;
-            this.displayName = displayName;
-        }
-
-        public long getId() {
-            return id;
         }
 
         @Override
         public String toString() {
-            return displayName;
+            return label;
         }
     }
 }

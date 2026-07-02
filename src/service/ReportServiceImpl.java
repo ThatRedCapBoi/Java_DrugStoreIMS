@@ -16,7 +16,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public List<ReportRow> generateReport(ReportFilter filter) {
         if (filter == null) {
-            filter = new ReportFilter();
+            filter = new ReportFilter(null, null, null, null, 0);
         }
         return productRepo.findByFilter(filter);
     }
