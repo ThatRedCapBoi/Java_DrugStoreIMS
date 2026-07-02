@@ -1,0 +1,8 @@
+build/
+dist/
+*.class
+*.jar
+
+bproject/private/
+
+bproject/private/
