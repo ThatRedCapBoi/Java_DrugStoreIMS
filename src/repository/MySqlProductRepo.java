@@ -149,8 +149,7 @@ public class MySqlProductRepo implements ProductRepo {
     @Override
     public List<Product> search(String query) {
         String q = (query == null) ? "" : query.trim();
-        String sql = "SELECT id, sku, name, price, quantity, category_id, vendor_id "
-        String sql = "SELECT id, sku, name, price, quantity, category_id, created_at, updated_at "
+        String sql = "SELECT id, sku, name, price, quantity, category_id, vendor_id, created_at, updated_at "
                 + "FROM products WHERE sku LIKE ? OR name LIKE ? ORDER BY name";
 
         List<Product> list = new ArrayList<>();
@@ -214,8 +213,7 @@ public class MySqlProductRepo implements ProductRepo {
 
     @Override
     public List<Product> findLowStock(int threshold) {
-        String sql = "SELECT id, sku, name, price, quantity, category_id, vendor_id "
-        String sql = "SELECT id, sku, name, price, quantity, category_id, created_at, updated_at "
+        String sql = "SELECT id, sku, name, price, quantity, category_id, vendor_id, created_at, updated_at "
                 + "FROM products WHERE quantity <= ? ORDER BY quantity ASC, name ASC";
         List<Product> list = new ArrayList<>();
 

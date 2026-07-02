@@ -78,6 +78,8 @@ public class Product {
 
     public void setVendorId(Long vendorId) {
         this.vendorId = vendorId;
+    }
+
     public String getVendor() {
         return vendor;
     }
