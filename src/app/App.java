@@ -24,6 +24,11 @@ import service.ProductServiceImpl;
 import controller.DashboardController;
 import service.DashboardService;
 import service.DashboardServiceImpl;
+import controller.AuditLogController;
+import repository.AuditLogRepo;
+import repository.MySqlAuditLogRepo;
+import service.AuditLogService;
+import service.AuditLogServiceImpl;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import javax.swing.UIManager;
@@ -46,24 +51,27 @@ public class App {
         UserRepo userRepo = new MySqlUserRepo(db);
         CategoryRepo categoryRepo = new MySqlCategoryRepo(db);
         ProductRepo productRepo = new MySqlProductRepo(db);
-        
+        AuditLogRepo auditLogRepo = new MySqlAuditLogRepo(db);
+
         // Services
         AuthService authService = new AuthServiceImpl(userRepo);
         CategoryService categoryService = new CategoryServiceImpl(categoryRepo);
-        ProductService productService = new ProductServiceImpl(productRepo);
+        AuditLogService auditLogService = new AuditLogServiceImpl(auditLogRepo, authService);
+        ProductService productService = new ProductServiceImpl(productRepo, auditLogService);
         DataExchangeService dataExchangeService = new DataExchangeServiceImpl(productRepo);
         DashboardService dashboardService = new DashboardServiceImpl(productRepo, categoryRepo);
-        
+
         // Controllers
         AuthController authController = new AuthController(authService);
         CategoryController categoryController = new CategoryController(categoryService);
         ProductController productController = new ProductController(productService);
         DataExchangeController dataExchangeController = new DataExchangeController(dataExchangeService);
         DashboardController dashboardController = new DashboardController(dashboardService);
-        
+        AuditLogController auditLogController = new AuditLogController(auditLogService);
+
         // Start UI
         SwingUtilities.invokeLater(() -> {
-            new LoginView(authController, categoryController, productController, dataExchangeController, dashboardController).setVisible(true);
+            new LoginView(authController, categoryController, productController, dataExchangeController, dashboardController, auditLogController).setVisible(true);
         });
     }
 }

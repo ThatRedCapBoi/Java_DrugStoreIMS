@@ -14,6 +14,7 @@ public class StaffState implements AppState {
             dv.setProductFormEnabled(true);
             dv.setDataExchangeEnabled(false);
             dv.setDashboardGenerateEnabled(false);
+            dv.setAuditLogEnabled(false);
         } else if (view instanceof ProductListView) {
             ProductListView pv = (ProductListView) view;
             pv.setAddEnabled(true);

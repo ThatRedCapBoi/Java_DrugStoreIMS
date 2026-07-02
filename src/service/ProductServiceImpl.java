@@ -18,9 +18,11 @@ import validation.ProductRequiredValidator;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepo repo;
+    private final AuditLogService auditLog;
 
-    public ProductServiceImpl(ProductRepo repo) {
+    public ProductServiceImpl(ProductRepo repo, AuditLogService auditLog) {
         this.repo = repo;
+        this.auditLog = auditLog;
     }
 
     @Override
@@ -48,7 +50,9 @@ public class ProductServiceImpl implements ProductService {
 
         p.setSku(p.getSku().trim());
         p.setName(p.getName().trim());
-        return repo.save(p);
+        Product saved = repo.save(p);
+        auditLog.record("CREATE", saved.getId(), saved.getName() + " (" + saved.getSku() + ")");
+        return saved;
     }
 
     @Override
@@ -60,6 +64,7 @@ public class ProductServiceImpl implements ProductService {
         p.setSku(p.getSku().trim());
         p.setName(p.getName().trim());
         repo.update(p);
+        auditLog.record("UPDATE", p.getId(), p.getName() + " (" + p.getSku() + ")");
     }
 
     @Override
@@ -68,7 +73,10 @@ public class ProductServiceImpl implements ProductService {
         if (id <= 0) {
             throw new ProductException("Invalid product id.");
         }
+        Product p = repo.findById(id).orElse(null);
         repo.delete(id);
+        String desc = (p != null) ? (p.getName() + " (" + p.getSku() + ")") : ("id=" + id);
+        auditLog.record("DELETE", null, "Deleted " + desc + " [id=" + id + "]");
     }
 
     private void requireManager(String role) {

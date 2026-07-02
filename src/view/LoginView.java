@@ -9,6 +9,7 @@ import controller.CategoryController;
 import controller.ProductController;
 import controller.DataExchangeController;
 import controller.DashboardController;
+import controller.AuditLogController;
 import model.User;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -24,6 +25,7 @@ public class LoginView extends javax.swing.JFrame {
     private ProductController productController;
     private DataExchangeController dataexchangeController;
     private DashboardController dashboardController;
+    private AuditLogController auditLogController;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LoginView.class.getName());
 
     /**
@@ -33,21 +35,22 @@ public class LoginView extends javax.swing.JFrame {
         initComponents();
     }
 
-    public LoginView(AuthController authController, CategoryController categoryController, ProductController productController, DataExchangeController dataexchangeController, DashboardController dashboardController) {
+    public LoginView(AuthController authController, CategoryController categoryController, ProductController productController, DataExchangeController dataexchangeController, DashboardController dashboardController, AuditLogController auditLogController) {
         initComponents();
-        
+
         // FlatLaf Design
         txtUsername.putClientProperty("JTextField.placeholderText", "Enter username");
         txtPassword.putClientProperty("JTextField.placeholderText", "Enter password");
         txtPassword.putClientProperty("JPasswordField.showRevealButton", true);
         btnLogin.putClientProperty("JButton.buttonType", "roundRect");
         btnLogin.putClientProperty("FlatLaf.style", "background: #2196F3; foreground: #FFFFFF; font: bold;");
-        
+
         this.authController = authController;
         this.categoryController = categoryController;
         this.productController = productController;
         this.dataexchangeController = dataexchangeController;
         this.dashboardController = dashboardController;
+        this.auditLogController = auditLogController;
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -171,7 +174,7 @@ public class LoginView extends javax.swing.JFrame {
 
             User u = authController.login(username, password);
 
-            DashboardView dash = new DashboardView(authController, categoryController, productController, dataexchangeController, dashboardController, u);
+            DashboardView dash = new DashboardView(authController, categoryController, productController, dataexchangeController, dashboardController, auditLogController, u);
             dash.setVisible(true);
             this.dispose();
 
