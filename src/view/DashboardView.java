@@ -279,6 +279,7 @@ public class DashboardView extends javax.swing.JFrame {
         ProductListView v = new ProductListView(
                 productController,
                 categoryController,
+                vendorController,
                 user.getRole(),
                 () -> this.setVisible(true)
         );
