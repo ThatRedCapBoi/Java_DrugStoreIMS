@@ -70,4 +70,13 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <path id="classpath">
+        <fileset dir="lib" includes="*.jar"/>
+    </path>
+
+    <target name="-post-init">
+        <property name="javac.classpath" value="${javac.classpath}${path.separator}${toString:classpath}"/>
+        <property name="run.classpath" value="${run.classpath}${path.separator}${toString:classpath}"/>
+    </target>
+
 </project>

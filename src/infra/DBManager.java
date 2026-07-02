@@ -22,8 +22,12 @@ public class DBManager {
 
     private DBManager() {
         try {
+            // Explicitly load the driver
             Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException ignored) {
+            System.out.println("Driver loaded successfully.");
+        } catch (ClassNotFoundException e) {
+            System.err.println("MySQL JDBC Driver not found!");
+            e.printStackTrace();
         }
     }
 
