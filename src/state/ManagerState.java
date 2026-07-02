@@ -19,6 +19,7 @@ public class ManagerState implements AppState {
             dv.setProductFormEnabled(true);
             dv.setDataExchangeEnabled(true);
             dv.setDashboardGenerateEnabled(true);
+            dv.setReportEnabled(true);
             dv.setVendorModuleEnabled(true);
         } else if (view instanceof ProductListView) {
             ProductListView pv = (ProductListView) view;

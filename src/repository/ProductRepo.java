@@ -33,4 +33,6 @@ public interface ProductRepo {
     int countLowStock(int threshold);
 
     java.util.List<model.Product> findLowStock(int threshold);
+
+    java.util.List<dto.ReportRow> findByFilter(dto.ReportFilter filter);
 }

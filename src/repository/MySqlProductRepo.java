@@ -4,6 +4,8 @@
  */
 package repository;
 
+import dto.ReportFilter;
+import dto.ReportRow;
 import infra.DBManager;
 import java.sql.*;
 import java.util.ArrayList;
@@ -227,6 +229,81 @@ public class MySqlProductRepo implements ProductRepo {
 
         } catch (SQLException e) {
             throw new RuntimeException("findLowStock failed: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<ReportRow> findByFilter(ReportFilter filter) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.id, p.sku, p.name, p.price, p.quantity, "
+                + "c.name AS category_name, p.created_at, p.updated_at "
+                + "FROM products p LEFT JOIN categories c ON p.category_id = c.id "
+                + "WHERE 1=1");
+
+        List<Object> params = new ArrayList<>();
+
+        String keyword = (filter.getProductQuery() == null) ? "" : filter.getProductQuery().trim();
+        if (!keyword.isEmpty()) {
+            sql.append(" AND (p.sku LIKE ? OR p.name LIKE ?)");
+            params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
+        }
+
+        if (filter.getCategoryId() != null) {
+            sql.append(" AND p.category_id = ?");
+            params.add(filter.getCategoryId());
+        }
+
+        if (filter.getFrom() != null) {
+            sql.append(" AND DATE(p.created_at) >= ?");
+            params.add(java.sql.Date.valueOf(filter.getFrom()));
+        }
+
+        if (filter.getTo() != null) {
+            sql.append(" AND DATE(p.created_at) <= ?");
+            params.add(java.sql.Date.valueOf(filter.getTo()));
+        }
+
+        sql.append(" ORDER BY p.name");
+
+        List<ReportRow> list = new ArrayList<>();
+        try (Connection c = db.getConnection();
+                PreparedStatement ps = c.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof String) {
+                    ps.setString(i + 1, (String) param);
+                } else if (param instanceof Long) {
+                    ps.setLong(i + 1, (Long) param);
+                } else if (param instanceof java.sql.Date) {
+                    ps.setDate(i + 1, (java.sql.Date) param);
+                }
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ReportRow row = new ReportRow();
+                    row.setId(rs.getLong("id"));
+                    row.setSku(rs.getString("sku"));
+                    row.setName(rs.getString("name"));
+                    row.setPrice(rs.getBigDecimal("price"));
+                    row.setQuantity(rs.getInt("quantity"));
+                    row.setCategoryName(rs.getString("category_name"));
+
+                    Timestamp created = rs.getTimestamp("created_at");
+                    row.setCreatedAt(created != null ? created.toLocalDateTime().toString().replace('T', ' ') : "");
+
+                    Timestamp updated = rs.getTimestamp("updated_at");
+                    row.setUpdatedAt(updated != null ? updated.toLocalDateTime().toString().replace('T', ' ') : "");
+
+                    list.add(row);
+                }
+            }
+            return list;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Product findByFilter failed: " + e.getMessage(), e);
         }
     }
 }

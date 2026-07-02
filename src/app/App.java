@@ -5,6 +5,7 @@ import controller.CategoryController;
 import controller.DataExchangeController;
 import controller.DashboardController;
 import controller.ProductController;
+import controller.ReportController;
 import controller.VendorController;
 import infra.DBManager;
 import repository.CategoryRepo;
@@ -25,6 +26,11 @@ import service.DataExchangeService;
 import service.DataExchangeServiceImpl;
 import service.ProductService;
 import service.ProductServiceImpl;
+import controller.DashboardController;
+import service.DashboardService;
+import service.DashboardServiceImpl;
+import service.ReportService;
+import service.ReportServiceImpl;
 import service.VendorService;
 import service.VendorServiceImpl;
 import view.LoginView;
@@ -58,6 +64,7 @@ public class App {
         CategoryService categoryService = new CategoryServiceImpl(categoryRepo);
         ProductService productService = new ProductServiceImpl(productRepo);
         DataExchangeService dataExchangeService = new DataExchangeServiceImpl(productRepo);
+        ReportService reportService = new ReportServiceImpl(productRepo);
         VendorService vendorService = new VendorServiceImpl(vendorRepo);
         DashboardService dashboardService = new DashboardServiceImpl(productRepo, categoryRepo);
         
@@ -67,11 +74,12 @@ public class App {
         ProductController productController = new ProductController(productService);
         DataExchangeController dataExchangeController = new DataExchangeController(dataExchangeService);
         DashboardController dashboardController = new DashboardController(dashboardService);
+        ReportController reportController = new ReportController(reportService);
         VendorController vendorController = new VendorController(vendorService);
         
         // Start UI
         SwingUtilities.invokeLater(() -> {
-            new LoginView(authController, categoryController, productController, dataExchangeController, dashboardController, vendorController).setVisible(true);
+            new LoginView(authController, categoryController, productController, dataExchangeController, dashboardController, reportController, vendorController).setVisible(true);
         });
     }
 }

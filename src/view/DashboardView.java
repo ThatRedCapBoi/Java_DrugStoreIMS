@@ -12,6 +12,7 @@ import controller.CategoryController;
 import controller.ProductController;
 import controller.DataExchangeController;
 import controller.DashboardController;
+import controller.ReportController;
 import controller.VendorController;
 import model.User;
 import state.AppState;
@@ -28,6 +29,7 @@ public class DashboardView extends javax.swing.JFrame {
     private ProductController productController;
     private DataExchangeController dataexchangeController;
     private DashboardController dashboardController;
+    private ReportController reportController;
     private VendorController vendorController;
     private User user;
 
@@ -36,6 +38,7 @@ public class DashboardView extends javax.swing.JFrame {
             ProductController productController,
             DataExchangeController dataexchangeController,
             DashboardController dashboardController,
+            ReportController reportController,
             VendorController vendorController,
             User user
     ) {
@@ -45,6 +48,7 @@ public class DashboardView extends javax.swing.JFrame {
         this.productController = productController;
         this.dataexchangeController = dataexchangeController;
         this.dashboardController = dashboardController;
+        this.reportController = reportController;
         this.vendorController = vendorController;
         this.user = user;
 
@@ -70,6 +74,10 @@ public class DashboardView extends javax.swing.JFrame {
 
     public void setDashboardGenerateEnabled(boolean enabled) {
         btnGenerateDashboard.setEnabled(enabled);
+    }
+
+    public void setReportEnabled(boolean enabled) {
+        btnReport.setEnabled(enabled);
     }
 
     public void setVendorModuleEnabled(boolean enabled) {
@@ -98,6 +106,7 @@ public class DashboardView extends javax.swing.JFrame {
         btnVendors = new javax.swing.JButton();
         btnImportExport = new javax.swing.JButton();
         btnGenerateDashboard = new javax.swing.JButton();
+        btnReport = new javax.swing.JButton();
         lblWelcome = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -172,6 +181,13 @@ public class DashboardView extends javax.swing.JFrame {
             }
         });
 
+        btnReport.setText("Inventory Report");
+        btnReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReportActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -182,6 +198,16 @@ public class DashboardView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnCategories, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
+                                .addComponent(btnProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(63, 63, 63)
+                                .addComponent(btnImportExport, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
+                                .addGap(8, 8, 8))))
+                    .addComponent(btnGenerateDashboard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnReport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnVendors, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
                         .addComponent(btnProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(63, 63, 63)
@@ -211,6 +237,12 @@ public class DashboardView extends javax.swing.JFrame {
                             .addComponent(btnImportExport, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(18, 18, 18)
+                .addComponent(btnGenerateDashboard, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnReport, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnVendors, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnVendors, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnGenerateDashboard, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -222,7 +254,7 @@ public class DashboardView extends javax.swing.JFrame {
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
         authController.logout();
-        new LoginView(authController, categoryController, productController, dataexchangeController, dashboardController, vendorController).setVisible(true);
+        new LoginView(authController, categoryController, productController, dataexchangeController, dashboardController, reportController, vendorController).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnLogoutActionPerformed
 
@@ -256,6 +288,12 @@ public class DashboardView extends javax.swing.JFrame {
     private void btnGenerateDashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateDashboardActionPerformed
         new ReportView(dashboardController, categoryController, user.getRole()).setVisible(true);
     }//GEN-LAST:event_btnGenerateDashboardActionPerformed
+
+    private void btnReportActionPerformed(java.awt.event.ActionEvent evt) {
+        StaffReportView v = new StaffReportView(reportController, categoryController, () -> this.setVisible(true));
+        v.setVisible(true);
+        this.setVisible(false);
+    }
 
     private void btnVendorsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVendorsActionPerformed
         VendorListView v = new VendorListView(
@@ -298,6 +336,7 @@ public class DashboardView extends javax.swing.JFrame {
     private javax.swing.JButton btnImportExport;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnProducts;
+    private javax.swing.JButton btnReport;
     private javax.swing.JButton btnVendors;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
