@@ -37,6 +37,19 @@ public class CategoryListView extends javax.swing.JFrame {
         
         setLocationRelativeTo(null);
 
+        // FlatLaf button styling
+        String primaryStyle = "background: #2196F3; foreground: #FFFFFF; font: bold;";
+        String dangerStyle = "background: #E53935; foreground: #FFFFFF; font: bold;";
+        javax.swing.JButton[] actionBtns = {btnAdd, btnEdit, btnRefresh};
+        for (javax.swing.JButton b : actionBtns) {
+            b.putClientProperty("JButton.buttonType", "roundRect");
+            b.putClientProperty("FlatLaf.style", primaryStyle);
+        }
+        btnDelete.putClientProperty("JButton.buttonType", "roundRect");
+        btnDelete.putClientProperty("FlatLaf.style", dangerStyle);
+        btnBack.putClientProperty("JButton.buttonType", "roundRect");
+        
+        
         tableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Description"}, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
