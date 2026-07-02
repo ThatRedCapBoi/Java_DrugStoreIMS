@@ -28,8 +28,8 @@
     - Use `infra.AppConfig` for centralized colors/fonts.
 
 ## Default Credentials
-- **Manager:** `manager` / `manager123`
-- **Staff:** `staff` / `staff123`
+- **Manager:** `manager` / `Manager123`
+- **Staff:** `staff` / `Staff123`
 
 ## Features
 - User Auth (Role-based: Manager/Staff)
