@@ -25,7 +25,6 @@ public class ProductListView extends javax.swing.JFrame {
     private ProductController productController;
     private CategoryController categoryController;
     private controller.VendorController vendorController;
-    private VendorController vendorController;
     private String role;
     private DefaultTableModel tableModel;
     private final Runnable onBack;
@@ -33,7 +32,6 @@ public class ProductListView extends javax.swing.JFrame {
     /**
      * Creates new form ProductListView
      */
-public ProductListView(ProductController productController, CategoryController categoryController, VendorController vendorController, String role, Runnable onBack) {
 public ProductListView(ProductController productController, CategoryController categoryController, controller.VendorController vendorController, String role, Runnable onBack) {
         initComponents();
         this.productController = productController;
@@ -110,18 +108,10 @@ public ProductListView(ProductController productController, CategoryController c
         for (model.Vendor v : vendors) {
             vendorName.put(v.getVendorID(), v.getVendorName());
         }
-
-        
-        List<model.Vendor> vendors = vendorController.listVendors();
-        java.util.Map<Long, String> vendorName = new java.util.HashMap<>();
-        for (model.Vendor v : vendors) {
-            vendorName.put(v.getId(), v.getName());
-        }
         
         java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy");
         for (Product p : products) {
             String cName = catName.getOrDefault(p.getCategoryId(), "N/A");
-            String vendor = p.getVendorId() != null ? vendorName.getOrDefault(p.getVendorId(), "N/A") : "N/A";
             String vName = (p.getVendorID() != null) ? vendorName.getOrDefault(p.getVendorID(), "N/A") : "N/A";
             String created = p.getCreatedAt() != null ? p.getCreatedAt().format(fmt) : "";
             String updated = p.getUpdatedAt() != null ? p.getUpdatedAt().format(fmt) : "";

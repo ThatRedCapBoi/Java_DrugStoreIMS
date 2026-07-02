@@ -13,13 +13,15 @@ public class ReportFilter {
     private final LocalDate from;      // null = no lower bound (on created_at)
     private final LocalDate to;        // null = no upper bound
     private final Long categoryId;     // null = all categories
+    private final Integer vendorId;    // null = all vendors
     private final String productQuery; // null/blank = all products (matches name or SKU)
     private final int threshold;       // low-stock threshold
 
-    public ReportFilter(LocalDate from, LocalDate to, Long categoryId, String productQuery, int threshold) {
+    public ReportFilter(LocalDate from, LocalDate to, Long categoryId, Integer vendorId, String productQuery, int threshold) {
         this.from = from;
         this.to = to;
         this.categoryId = categoryId;
+        this.vendorId = vendorId;
         this.productQuery = productQuery;
         this.threshold = threshold;
     }
@@ -34,6 +36,10 @@ public class ReportFilter {
 
     public Long getCategoryId() {
         return categoryId;
+    }
+
+    public Integer getVendorId() {
+        return vendorId;
     }
 
     public String getProductQuery() {

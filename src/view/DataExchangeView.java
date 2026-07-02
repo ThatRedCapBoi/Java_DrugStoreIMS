@@ -12,6 +12,7 @@ import controller.DataExchangeController;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import state.AppState;
 import state.StateFactory;
 
@@ -177,6 +178,14 @@ public class DataExchangeView extends javax.swing.JFrame {
         try {
             JFileChooser fc = new JFileChooser();
             fc.setDialogTitle("Export Inventory (Products) - " + selectedFormat());
+            fc.setAcceptAllFileFilterUsed(false);
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV Files (*.csv)", "csv");
+            fc.setFileFilter(filter);
+
+            String defaultName = "product_inventory.csv";
+            File selected = new File(defaultName);
+            fc.setSelectedFile(selected);
+
             int r = fc.showSaveDialog(this);
             if (r != JFileChooser.APPROVE_OPTION) return;
 

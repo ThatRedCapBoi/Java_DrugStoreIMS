@@ -294,11 +294,13 @@ public class DashboardView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnImportExportActionPerformed
 
     private void btnGenerateDashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateDashboardActionPerformed
-        new ReportView(dashboardController, categoryController, vendorController, user.getRole()).setVisible(true);
+        ReportView v = new ReportView(dashboardController, categoryController, vendorController, user.getRole(), () -> this.setVisible(true));
+        v.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_btnGenerateDashboardActionPerformed
 
     private void btnReportActionPerformed(java.awt.event.ActionEvent evt) {
-        StaffReportView v = new StaffReportView(reportController, categoryController, () -> this.setVisible(true));
+        InventoryReportView v = new InventoryReportView(reportController, categoryController, () -> this.setVisible(true));
         v.setVisible(true);
         this.setVisible(false);
     }

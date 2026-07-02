@@ -37,6 +37,7 @@ public class ReportView extends JFrame {
     private static final int THRESHOLD = 10;
 
     private final DashboardController dashboardController;
+    private final Runnable onBack;
 
     private final JComboBox<CategoryItem> cboCategory = new JComboBox<>();
     private final JComboBox<VendorItem> cboVendor = new JComboBox<>();
@@ -54,16 +55,18 @@ public class ReportView extends JFrame {
     private final JLabel lblSummary = new JLabel(" ");
     private final Map<Long, String> categoryNames = new HashMap<>();
     private Map<Integer, String> vendorNames = new HashMap<>();
+    private JButton btnBack;
 
-    public ReportView(DashboardController dashboardController, CategoryController categoryController, controller.VendorController vendorController, String role) {
+    public ReportView(DashboardController dashboardController, CategoryController categoryController, controller.VendorController vendorController, String role, Runnable onBack) {
         this.dashboardController = dashboardController;
-
+        this.onBack = onBack;
+        
         setTitle("Generate Report (" + role + ")");
-        setSize(960, 560);
+        setSize(1280, 560);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
-
+       
         DefaultComboBoxModel<CategoryItem> catModel = new DefaultComboBoxModel<>();
         catModel.addElement(new CategoryItem("All categories", null));
         for (Category c : categoryController.listCategories()) {
@@ -88,8 +91,7 @@ public class ReportView extends JFrame {
         split.setResizeWeight(0.55);
         add(split, BorderLayout.CENTER);
 
-        lblSummary.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
-        add(lblSummary, BorderLayout.SOUTH);
+        add(buildBottomBar(), BorderLayout.SOUTH);
 
         generate(); // initial unfiltered report
     }
@@ -109,11 +111,38 @@ public class ReportView extends JFrame {
         JButton btnGenerate = new JButton("Generate");
         btnGenerate.addActionListener(e -> generate());
         bar.add(btnGenerate);
+
+        // FlatLaf button styling
+        String primaryStyle = "background: #2196F3; foreground: #FFFFFF; font: bold;";
+        javax.swing.JButton[] actionBtns = {btnGenerate};
+        for (javax.swing.JButton b : actionBtns) {
+            b.putClientProperty("JButton.buttonType", "roundRect");
+            b.putClientProperty("FlatLaf.style", primaryStyle);
+        }
+        
         txtFrom.setToolTipText("yyyy-MM-dd (optional)");
         txtTo.setToolTipText("yyyy-MM-dd (optional)");
         return bar;
     }
 
+    private JPanel buildBottomBar() {
+        JPanel bottomPanel = new JPanel(new BorderLayout(8, 0));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
+
+        lblSummary.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        bottomPanel.add(lblSummary, BorderLayout.CENTER);
+
+        btnBack = new JButton("Back to Dashboard");
+        btnBack.addActionListener(e -> onBack());
+        bottomPanel.add(btnBack, BorderLayout.EAST);
+
+        String primaryStyle = "background: #2196F3; foreground: #FFFFFF; font: bold;";
+        btnBack.putClientProperty("JButton.buttonType", "roundRect");
+        btnBack.putClientProperty("FlatLaf.style", primaryStyle);
+
+        return bottomPanel;
+    }
+    
     private void generate() {
         LocalDate from;
         LocalDate to;
@@ -129,9 +158,12 @@ public class ReportView extends JFrame {
 
         CategoryItem selected = (CategoryItem) cboCategory.getSelectedItem();
         Long categoryId = (selected == null) ? null : selected.id;
+        VendorItem selectedVendor = (VendorItem) cboVendor.getSelectedItem();
+        Integer vendorId = (selectedVendor == null || selectedVendor.id == null || selectedVendor.id == 0)
+                ? null : selectedVendor.id;
         String product = txtProduct.getText().trim();
 
-        ReportFilter filter = new ReportFilter(from, to, categoryId,
+        ReportFilter filter = new ReportFilter(from, to, categoryId, vendorId,
                 product.isEmpty() ? null : product, THRESHOLD);
 
         try {
@@ -158,6 +190,13 @@ public class ReportView extends JFrame {
                     "Generate report failed:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void onBack() {
+        if (onBack != null) {
+            onBack.run();
+        }
+        dispose();
     }
 
     private LocalDate parseDate(String text) {

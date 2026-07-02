@@ -17,7 +17,7 @@ import java.util.List;
  * Inventory Report view accessible to both Staff and Manager.
  * Allows filtering by date range (product added date), product SKU/name, and category.
  */
-public class StaffReportView extends JFrame {
+public class InventoryReportView extends JFrame {
 
     private final ReportController reportController;
     private final CategoryController categoryController;
@@ -34,7 +34,7 @@ public class StaffReportView extends JFrame {
     private DefaultTableModel tableModel;
     private JLabel lblSummary;
 
-    public StaffReportView(ReportController reportController,
+    public InventoryReportView(ReportController reportController,
             CategoryController categoryController,
             Runnable onBack) {
         this.reportController = reportController;
@@ -130,6 +130,14 @@ public class StaffReportView extends JFrame {
         btnBack = new JButton("Back to Dashboard");
         btnBack.addActionListener(e -> onBack());
         bottomPanel.add(btnBack, BorderLayout.EAST);
+        // FlatLaf button styling
+        String primaryStyle = "background: #2196F3; foreground: #FFFFFF; font: bold;";
+        String dangerStyle = "background: #E53935; foreground: #FFFFFF; font: bold;";
+        javax.swing.JButton[] actionBtns = {btnGenerate, btnClear, btnBack};
+        for (javax.swing.JButton b : actionBtns) {
+            b.putClientProperty("JButton.buttonType", "roundRect");
+            b.putClientProperty("FlatLaf.style", primaryStyle);
+        }
 
         // ── Frame layout ─────────────────────────────────────────────────────
         JPanel content = new JPanel(new BorderLayout(8, 8));
@@ -196,7 +204,7 @@ public class StaffReportView extends JFrame {
         CategoryItem selected = (CategoryItem) cmbCategory.getSelectedItem();
         Long categoryId = (selected == null || selected.getId() <= 0) ? null : selected.getId();
 
-        ReportFilter filter = new ReportFilter(dateFrom, dateTo, categoryId,
+        ReportFilter filter = new ReportFilter(dateFrom, dateTo, categoryId, null,
                 keyword.isEmpty() ? null : keyword, 0);
 
         try {

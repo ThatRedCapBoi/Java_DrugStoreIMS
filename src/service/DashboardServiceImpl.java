@@ -47,6 +47,11 @@ public class DashboardServiceImpl implements DashboardService {
             if (filter.getCategoryId() != null && p.getCategoryId() != filter.getCategoryId()) {
                 continue;
             }
+            if (filter.getVendorId() != null) {
+                if (p.getVendorID() == null || !p.getVendorID().equals(filter.getVendorId())) {
+                    continue;
+                }
+            }
             if (!query.isEmpty()
                     && !contains(p.getName(), query)
                     && !contains(p.getSku(), query)) {
