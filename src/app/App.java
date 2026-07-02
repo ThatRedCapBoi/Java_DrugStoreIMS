@@ -58,7 +58,6 @@ public class App {
         CategoryService categoryService = new CategoryServiceImpl(categoryRepo);
         ProductService productService = new ProductServiceImpl(productRepo);
         DataExchangeService dataExchangeService = new DataExchangeServiceImpl(productRepo);
-        DashboardService dashboardService = new DashboardServiceImpl(productRepo);
         VendorService vendorService = new VendorServiceImpl(vendorRepo);
         DashboardService dashboardService = new DashboardServiceImpl(productRepo, categoryRepo);
         

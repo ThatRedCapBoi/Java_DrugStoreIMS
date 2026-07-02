@@ -42,8 +42,7 @@ public class MySqlProductRepo implements ProductRepo {
 
     @Override
     public List<Product> findAll() {
-        String sql = "SELECT id, sku, name, price, quantity, category_id, vendor_id FROM products ORDER BY name";
-        String sql = "SELECT id, sku, name, price, quantity, category_id, created_at, updated_at FROM products ORDER BY name";
+        String sql = "SELECT id, sku, name, price, quantity, category_id, vendor_id, created_at, updated_at FROM products ORDER BY name";
         List<Product> list = new ArrayList<>();
 
         try (Connection c = db.getConnection(); PreparedStatement ps = c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
@@ -60,8 +59,7 @@ public class MySqlProductRepo implements ProductRepo {
 
     @Override
     public Optional<Product> findById(long id) {
-        String sql = "SELECT id, sku, name, price, quantity, category_id, vendor_id FROM products WHERE id = ?";
-        String sql = "SELECT id, sku, name, price, quantity, category_id, created_at, updated_at FROM products WHERE id = ?";
+        String sql = "SELECT id, sku, name, price, quantity, category_id, vendor_id, created_at, updated_at FROM products WHERE id = ?";
 
         try (Connection c = db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
 
