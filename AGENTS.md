@@ -54,7 +54,17 @@ Every implementation task maps to a **Design Review Action Code** (from the DR R
 - Inventory Tracking (Stock, Price)
 
 ## Git Commits
-- Use Conventional Commits: `feat`, `fix`, `perf`, `ref`, `style`, `chore`, `test`.
+- Use Conventional Commits and organize changes into categories.
+  - `feat`: a new feature or enhancement.
+  - `fix`: a bug fix or behavior correction.
+  - `perf`: a performance improvement.
+  - `refactor`: code structure change with no feature or bug fix.
+  - `style`: formatting, whitespace, or UI polish only.
+  - `test`: adding or updating tests.
+  - `chore`: tooling, build, dependency, migration, or other maintenance work.
+  - `docs`: documentation-only changes.
+- Use scopes when helpful to clarify the area of change.
+  - Examples: `feat(db):`, `fix(ui):`, `refactor(repo):`, `chore(build):`, `docs(readme):`.
 - For branches, create the branch using this format: `feat/actionCode-description`.
     - `feat` is the example if the branch is a feature branch. Use other conventions for other branch purposes.
     - `actionCode` will require the user to specify which action item from the Design Review or SCMP document. Prompt the user if not specified by them.
